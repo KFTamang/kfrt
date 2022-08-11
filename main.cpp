@@ -7,6 +7,7 @@ int main(void){
     std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
 
     for(int i=0; i<image_height; i++){
+        std::cerr << "Scanline remaining:" << image_height - i << std::endl;
         for(int j=0; j<image_width; j++){
             auto r = double(i) / (image_width - 1);
             auto b = double(j) / (image_height - 1);
@@ -18,6 +19,6 @@ int main(void){
             std::cout << ir << " " << ib << " " << ig << "\n";
         }
     }
-    
+    std::cerr << "Done\n";
     return 0;
 }
