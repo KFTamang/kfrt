@@ -50,8 +50,8 @@ class vec3{
 
 // type alias
 
-using point3 = vec3;
-using color = vec3;
+using Point3 = vec3;
+using Color = vec3;
 
 inline std::ostream& operator<<(std::ostream &out, const vec3 &v){
     return out << v[0] << " " << v[1] << " " << v[2];
