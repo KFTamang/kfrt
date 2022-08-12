@@ -47,7 +47,7 @@ int main(void){
     std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
 
     for(int j=image_height-1; j>=0; j--){
-        std::cerr << "Scanline remaining:" << image_height - j << std::endl;
+        std::cerr << "Scanline remaining:" << j << std::endl;
         for(int i=0; i < image_width; i++){
             auto u = double(i) / (image_width - 1);
             auto v = double(j) / (image_height - 1);
