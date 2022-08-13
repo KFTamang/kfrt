@@ -3,3 +3,4 @@ build:
 
 run:build
 	./main > image.ppm
+	pnmtojpeg image.ppm > image.jpeg
