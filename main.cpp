@@ -1,29 +1,15 @@
 #include <iostream>
-#include "vec3.h"
-#include "color.h"
-#include "ray.h"
+#include "kfrt.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
-double hit_sphere(const Point3& center, double radius, const Ray& r){
-    vec3 oc = r.origin() - center;
-    auto a = r.direction().length_squared();
-    auto half_b = dot(oc, r.direction());
-    auto c = oc.length_squared() - radius * radius;
-    auto discriminant = half_b * half_b - a * c;
-    if (discriminant < 0){
-        return -1;
-    }else{
-        return (-half_b - sqrt(discriminant)) / a;
-    }
-}
-
-Color ray_color(const Ray& r){
-    auto t = hit_sphere(Point3(0, 0, -1), 0.5, r);
-    if (t > 0.0){
-        vec3 N = unit_vector(r.at(t) - vec3(0, 0, -1));
-        return 0.5 * Color(N.x() + 1, N.y() + 1, N.z() + 1);
+Color ray_color(const Ray& r, Hittable& world){
+    HitRecord rec;
+    if (world.hit(r, 0, infinity, rec)){
+        return 0.5 * (rec.normal + Color(1, 1, 1));
     }
     vec3 unit_direction = unit_vector(r.direction());
-    t = 0.5 * (unit_direction.y() + 1.0);
+    auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 -t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
 }
 
@@ -43,6 +29,11 @@ int main(void){
     auto vertical = vec3(0, viewport_height, 0);
     auto lower_left_corner = origin - horizontal/2 - vertical/2 - vec3(0, 0, focal_length);
 
+    // world
+    auto world = HittableList();
+    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
+    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+
     // render
     std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
 
@@ -52,7 +43,7 @@ int main(void){
             auto u = double(i) / (image_width - 1);
             auto v = double(j) / (image_height - 1);
             Ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
-            Color pixel_color = ray_color(r);
+            Color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
