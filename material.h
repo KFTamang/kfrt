@@ -28,7 +28,9 @@ class Lambertian : public Material{
 
 class Metal : public Material{
     public:
-        Metal(const Color& a) : albedo(a){}
+        Metal(const Color& a, double f) : albedo(a){
+            fuzzyness = clamp(f, 0, 1);
+        }
         
         virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override{
             auto scatter_direction = reflect(incident.direction(), rec.normal);
@@ -36,12 +38,13 @@ class Metal : public Material{
                 // catch degeneration of scatter direction
                 scatter_direction = rec.normal;
             }
-            scattered = Ray(rec.p, scatter_direction);
+            scattered = Ray(rec.p, scatter_direction + fuzzyness * random_in_unit_sphere());
             attenuation = albedo;
             return (dot(scatter_direction, rec.normal) > 0);
         }
 
     private:
         Color albedo;
+        double fuzzyness;
 };
 
