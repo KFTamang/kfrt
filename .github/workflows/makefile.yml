@@ -1,0 +1,29 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: sudo apt-get install -y netpbm
+      
+    - name: Build the project
+      run: make build
+      
+    - name: Run the program and generate image
+      run: make run
+
+    - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version.
+      with:
+        add: 'image.jpeg'
+        message: 'Update image.jpeg by GitHub Actions'
