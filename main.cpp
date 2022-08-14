@@ -15,7 +15,7 @@ Color ray_color(const Ray& r, Hittable& object, int depth){
         return Color(0, 0, 0);
     }
     HitRecord rec;
-    if (!object.hit(r, 0, infinity, rec)){
+    if (!object.hit(r, 0.001, infinity, rec)){
         // background
         vec3 unit_direction = unit_vector(r.direction());
         auto t = 0.5 * (unit_direction.y() + 1.0);
