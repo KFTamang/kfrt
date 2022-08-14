@@ -5,9 +5,6 @@
 #include <limits>
 #include <cstdlib>
 
-#include "vec3.h"
-#include "ray.h"
-
 using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
@@ -32,3 +29,6 @@ inline double clamp(double x, double min, double max) {
     if (x > max) return max;
     return x;
 }
+
+#include "vec3.h"
+#include "ray.h"

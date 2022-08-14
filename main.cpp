@@ -5,7 +5,15 @@
 #include "color.h"
 #include "camera.h"
 
-Color ray_color(const Ray& r, Hittable& object){
+vec3 random_in_unit_sphere(){
+    return vec3::random(-1, 1);
+}
+
+Color ray_color(const Ray& r, Hittable& object, int depth){
+    if (depth <= 0){
+        // reaching the recursion limit, returning black color
+        return Color(0, 0, 0);
+    }
     HitRecord rec;
     if (!object.hit(r, 0, infinity, rec)){
         // background
@@ -14,7 +22,8 @@ Color ray_color(const Ray& r, Hittable& object){
         return (1.0 -t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
     }
     // when hitting object
-    return 0.5 * (rec.normal + Color(1, 1, 1));
+    Ray new_ray = Ray(rec.p, random_in_unit_sphere() + rec.normal);
+    return 0.5 * ray_color(new_ray, object, depth - 1);
 }
 
 int main(void){
@@ -22,6 +31,7 @@ int main(void){
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int sample_per_pixel = 100;
+    const int max_recursion = 50;
 
     // camera
     Camera cam;
@@ -42,7 +52,7 @@ int main(void){
                 auto u = double(i + random_double()) / (image_width - 1);
                 auto v = double(j + random_double()) / (image_height - 1);
                 auto r = cam.get_ray(u, v);
-                pixel_color += ray_color(r, world);                
+                pixel_color += ray_color(r, world, max_recursion);                
             }
             write_color(std::cout, pixel_color, sample_per_pixel);
         }
