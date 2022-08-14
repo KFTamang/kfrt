@@ -9,6 +9,10 @@ vec3 random_in_unit_sphere(){
     return vec3::random(-1, 1);
 }
 
+vec3 random_unit_vector(){
+    return unit_vector(random_in_unit_sphere());
+}
+
 Color ray_color(const Ray& r, Hittable& object, int depth){
     if (depth <= 0){
         // reaching the recursion limit, returning black color
@@ -22,7 +26,7 @@ Color ray_color(const Ray& r, Hittable& object, int depth){
         return (1.0 -t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
     }
     // when hitting object
-    Ray new_ray = Ray(rec.p, random_in_unit_sphere() + rec.normal);
+    Ray new_ray = Ray(rec.p, random_unit_vector() + rec.normal);
     return 0.5 * ray_color(new_ray, object, depth - 1);
 }
 
