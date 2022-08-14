@@ -52,6 +52,11 @@ class vec3{
             return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
         }
 
+        inline bool is_near_zero(){
+            const double s = 1e-8;
+            return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+        } 
+
     private:
         double e[3];
 };
@@ -103,3 +108,11 @@ inline vec3 unit_vector(vec3 v){
     return v / v.length();
 }
 
+
+inline vec3 random_in_unit_sphere(){
+    return vec3::random(-1, 1);
+}
+
+inline vec3 random_unit_vector(){
+    return unit_vector(random_in_unit_sphere());
+}

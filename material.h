@@ -1,0 +1,27 @@
+#pragma once
+#include "kfrt.h"
+#include "hittable.h"
+
+class Material{
+    public:
+        virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const = 0;
+};
+
+class Lambertian : public Material{
+    public:
+        Lambertian(const Color& a) : albedo(a){}
+        
+        virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override{
+            auto scatter_direction = rec.normal + random_unit_vector();
+            if (scatter_direction.is_near_zero()){
+                // catch degeneration of scatter direction
+                scatter_direction = rec.normal;
+            }
+            scattered = Ray(rec.p, random_unit_vector() + rec.normal);
+            attenuation = albedo;
+            return true;
+        }
+
+    private:
+        Color albedo;
+};

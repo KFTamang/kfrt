@@ -4,14 +4,7 @@
 #include "sphere.h"
 #include "color.h"
 #include "camera.h"
-
-vec3 random_in_unit_sphere(){
-    return vec3::random(-1, 1);
-}
-
-vec3 random_unit_vector(){
-    return unit_vector(random_in_unit_sphere());
-}
+#include "material.h"
 
 Color ray_color(const Ray& r, Hittable& object, int depth){
     if (depth <= 0){
@@ -26,8 +19,12 @@ Color ray_color(const Ray& r, Hittable& object, int depth){
         return (1.0 -t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
     }
     // when hitting object
-    Ray new_ray = Ray(rec.p, random_unit_vector() + rec.normal);
-    return 0.5 * ray_color(new_ray, object, depth - 1);
+    Ray new_ray;
+    Color attenuation;
+    if (rec.mat_ptr->scatter(r, rec, attenuation, new_ray)){
+        return attenuation * ray_color(new_ray, object, depth - 1);
+    }
+    return Color(0, 0, 0);
 }
 
 int main(void){
@@ -42,8 +39,10 @@ int main(void){
 
     // world
     auto world = HittableList();
-    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
-    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+    auto material_ground = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
+    auto material_center = make_shared<Lambertian>(Color(0.7, 0.3, 0.3));
+    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, material_center));
+    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, material_ground));
 
     // render
     std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";

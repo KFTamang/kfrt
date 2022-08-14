@@ -1,9 +1,12 @@
 #pragma once
 #include "kfrt.h"
 
+class Material;
+
 struct HitRecord{
     Point3 p;
     vec3 normal;
+    shared_ptr<Material> mat_ptr;
     double t;
     bool front_surface;
 
