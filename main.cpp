@@ -27,29 +27,65 @@ Color ray_color(const Ray& r, Hittable& object, int depth){
     return Color(0, 0, 0);
 }
 
+HittableList make_random_world(){
+    HittableList world;
+    auto material_ground = make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+    world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, material_ground));
+    
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            auto choose_mat = random_double();
+            Point3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
+
+            if ((center - Point3(4, 0.2, 0)).length() > 0.9) {
+                shared_ptr<Material> sphere_material;
+
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    auto albedo = Color::random() * Color::random();
+                    sphere_material = make_shared<Lambertian>(albedo);
+                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                } else if (choose_mat < 0.95) {
+                    // Metal
+                    auto albedo = Color::random(0.5, 1);
+                    auto fuzz = random_double(0, 0.5);
+                    sphere_material = make_shared<Metal>(albedo, fuzz);
+                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                } else {
+                    // glass
+                    sphere_material = make_shared<Dielectric>(1.5);
+                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                }
+                std::cerr << a << " " << b << "\n";
+            }
+        }
+    }
+
+    auto material1 = make_shared<Dielectric>(1.5);
+    world.add(make_shared<Sphere>(Point3(0, 1, 0), 1.0, material1));
+
+    auto material2 = make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
+    world.add(make_shared<Sphere>(Point3(-4, 1, 0), 1.0, material2));
+
+    auto material3 = make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
+    world.add(make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
+
+    return world;
+}
+
 int main(void){
     const auto aspect_ratio = 16.0 / 9.0;
-    const auto vfov = 30.0; 
+    const auto vfov = 20.0; 
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int sample_per_pixel = 100;
+    const int sample_per_pixel = 500;
     const int max_recursion = 50;
 
     // camera
-    Camera cam(Point3(1, 3 , 1), Point3(0.1, -0.25, -0.8), vec3(0, 1, 0), vfov, aspect_ratio);
+    Camera cam(Point3(11, 5 , 5), Point3(0, 0, 0), vec3(0, 1, 0), vfov, aspect_ratio);
 
     // world
-    auto world = HittableList();
-    auto material_ground = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
-    auto material_center = make_shared<Lambertian>(Color(0.7, 0.3, 0.3));
-    auto material_left   = make_shared<Metal>(Color(0.8, 0.8, 0.8), 0);
-    auto material_right  = make_shared<Metal>(Color(0.4, 0.7, 0.3), 0.3);
-    auto material_glass  = make_shared<Dielectric>(1.5);
-    world.add(make_shared<Sphere>(Point3( 0,      0, -2), 0.5, material_center));
-    world.add(make_shared<Sphere>(Point3( 1,      0, -1), 0.5, material_right));
-    world.add(make_shared<Sphere>(Point3(-1,    0.5, -1), 0.5, material_left));
-    world.add(make_shared<Sphere>(Point3(0.1, -0.25, -0.8), 0.1, material_glass));
-    world.add(make_shared<Sphere>(Point3( 0, -100.5, -1), 100, material_ground));
+    auto world = make_random_world();
 
     // render
     std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
