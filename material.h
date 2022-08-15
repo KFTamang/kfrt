@@ -55,7 +55,15 @@ class Dielectric : public Material{
         virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override{
             auto unit_direction = unit_vector(incident.direction());
             auto refraction_ratio = rec.front_surface ? (1.0/ir) : (ir);
-            auto scatter_direction = refract(unit_direction, rec.normal, refraction_ratio);
+            auto cos_theta = fmin(dot(-unit_direction, rec.normal), 1.0); 
+            auto sin_theta = sqrt(1 - cos_theta * cos_theta);
+            bool can_refract = (refraction_ratio * sin_theta <= 1.0);
+            vec3 scatter_direction;
+            if (can_refract){
+                scatter_direction = refract(unit_direction, rec.normal, refraction_ratio);
+            }else{
+                scatter_direction = reflect(unit_direction, rec.normal);
+            }
             scattered = Ray(rec.p, scatter_direction);
             attenuation = Color(1, 1, 1);
             return true;
