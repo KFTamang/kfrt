@@ -98,10 +98,10 @@ inline double dot(const vec3 &u, const vec3 &v){
     return v[0] * u[0] + v[1] * u[1] + v[2] * u[2];
 }
 
-inline double cross(const vec3 &u, const vec3 &v){
-    return v[1] * u[2] - v[2] * u[1]
-         + v[2] * u[0] - v[0] * u[2]
-         + v[0] * u[1] - v[1] * u[0];
+inline vec3 cross(const vec3 &u, const vec3 &v){
+    return vec3(u[1] * v[2] - u[2] * v[1],
+                u[2] * v[0] - u[0] * v[2],
+                u[0] * v[1] - u[1] * v[0]);
 }
 
 inline vec3 unit_vector(vec3 v){
