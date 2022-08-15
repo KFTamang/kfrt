@@ -48,3 +48,19 @@ class Metal : public Material{
         double fuzzyness;
 };
 
+class Dielectric : public Material{
+    public:
+        Dielectric(double index_of_refraction): ir(index_of_refraction){}
+        
+        virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override{
+            auto unit_direction = unit_vector(incident.direction());
+            auto refraction_ratio = rec.front_surface ? (1.0/ir) : (ir);
+            auto scatter_direction = refract(unit_direction, rec.normal, refraction_ratio);
+            scattered = Ray(rec.p, scatter_direction);
+            attenuation = Color(1, 1, 1);
+            return true;
+        }
+
+    private:
+        double ir;
+};
