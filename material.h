@@ -59,7 +59,7 @@ class Dielectric : public Material{
             auto sin_theta = sqrt(1 - cos_theta * cos_theta);
             bool can_refract = (refraction_ratio * sin_theta <= 1.0);
             vec3 scatter_direction;
-            if (can_refract){
+            if (can_refract && (reflectance(cos_theta, refraction_ratio) < random_double())){
                 scatter_direction = refract(unit_direction, rec.normal, refraction_ratio);
             }else{
                 scatter_direction = reflect(unit_direction, rec.normal);
@@ -71,4 +71,11 @@ class Dielectric : public Material{
 
     private:
         double ir;
+
+        static double reflectance(double cos_theta, double refraction_ratio){
+            auto r0 = (1 - refraction_ratio) / (1 + refraction_ratio);
+            r0 = r0 + r0;
+            return r0 + (1 - r0) * pow((1-cos_theta), 5);
+        }
+
 };
