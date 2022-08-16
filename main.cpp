@@ -73,13 +73,17 @@ HittableList make_random_world(){
     return world;
 }
 
-int main(void){
+int main(int argc, char** argv){
+    if (argc != 4){
+        std::cerr << "Error: 2 arguments must be supplied.\n";
+        return 1;
+    }
     const auto aspect_ratio = 16.0 / 9.0;
     const auto vfov = 20.0; 
-    const int image_width = 400;
+    const int image_width = atof(argv[1]);
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int sample_per_pixel = 500;
-    const int max_recursion = 50;
+    const int sample_per_pixel = atoi(argv[2]);
+    const int max_recursion = atoi(argv[3]);
 
     // camera
     Camera cam(Point3(11, 5 , 5), Point3(0, 0, 0), vec3(0, 1, 0), vfov, aspect_ratio);
