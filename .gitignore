@@ -1,2 +1,6 @@
 main
 .vscode/*
+gmon.out
+main_for_profile
+profile_result.txt
+profile.*
